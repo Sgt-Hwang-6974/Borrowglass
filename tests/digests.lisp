@@ -1,0 +1,20 @@
+;;;; This Source Code Form is subject to the terms of the Mozilla Public
+;;;; License, v. 2.0. If a copy of the MPL was not distributed with this
+;;;; file, You can obtain one at https://mozilla.org/MPL/2.0/.
+(unless (find-package :borrowglass)
+  (load (merge-pathnames "../src/package.lisp" *load-truename*)))
+(unless (boundp 'borrowglass::*root*)
+  (defparameter borrowglass::*run-main* nil)
+  (load (merge-pathnames "../run.lisp" *load-truename*)))
+(in-package :borrowglass)
+(insist (equal (hex-bytes (blake2s (ascii "abc")))
+               "508c5e8c327c14e2e1a72ba34eeb452f37458b209ed63a294d999b4c86675982") "rfc7693_abc")
+(insist (equal (hex-bytes (blake2s (octets 0)))
+               "69217a3079908094e11121d042354a7c1f55b6482ca1a51e1b250dfd1ed0eef9") "blake2s_empty")
+(let ((tag (hmac-blake2s (ascii "key") (ascii "The quick brown fox jumps over the lazy dog"))))
+  (insist (= (length tag) 32) "hmac_size")
+  (insist (tag-equal-p tag (copy-seq tag)) "hmac_equal")
+  (dotimes (i 32)
+    (let ((other (copy-seq tag)))
+      (setf (aref other i) (logxor 1 (aref other i)))
+      (insist (not (tag-equal-p tag other)) "hmac_every_byte_matters"))))

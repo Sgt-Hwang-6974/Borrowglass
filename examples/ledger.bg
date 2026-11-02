@@ -1,0 +1,15 @@
+; Public account calculation fixture: add an opening balance and a deposit.
+; Loading this program cannot access the active three-tenant challenge instance.
+; The result is projected from a checked result branch in an isolated environment.
+(program
+  (module bg.primitive.memory ((r 6 row 1024 0))
+    ((fn entry ((r row unique))
+       ((row (words r unique 4)) (permit (token mut-borrow r)))
+       (result ((words r unique 4) (token mut-borrow r)) false 22020)
+       1 ((lifetime r row unique)) 1
+       (slice-set row (u32 1) (u32 901) permit next 22020
+         (return ok ((var row (words r unique 4)) (var next (token mut-borrow r))) (next))
+         (err (permit)) (return refuse ((var permit (token mut-borrow r))) (permit) 22020))))
+    4 15 15 (literal 0 eq 1) none true)
+  entry ((row (words r 6 0 unique 4 (1 101 102 103))) (permit (row-token 1 6 0)))
+  (1 101 102 103) 1024)

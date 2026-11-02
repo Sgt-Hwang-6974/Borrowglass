@@ -1,0 +1,4 @@
+; Bounded arithmetic fixture: signed division uses truncation toward zero.
+; This public example runs in a separate fixture environment. The typed operands
+; and checked operator return a result that the program dispatcher must inspect.
+(program (div (i64 -17) (i64 3) 22012 22003))
